@@ -10,7 +10,7 @@ Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／�
 
 ## 下載與使用
 
-從 [Releases](https://github.com/firzenfu/codex-ambient/releases) 下載 `CodexAmbient.exe`。EXE 約 34 MB，已內附 Node.js；不需要另外安裝 Node.js、npm 套件或取得系統管理員權限。
+下載 [CodexAmbient.exe（獨立版 v0.3.0）](https://github.com/firzenfu/codex-ambient/releases/download/v0.3.0/CodexAmbient.exe)。EXE 約 34 MB，已內附 Node.js；不需要另外安裝 Node.js、npm 套件或取得系統管理員權限。
 
 右上角的語言選單可切換 **繁體中文／English**，介面、預覽文案及提示會立即切換，不會重新啟動背景或影片。語言選擇會自動保存，下次開啟時恢復；EXE 系統匣選單在下次打開時也會使用相同語言。
 
@@ -29,7 +29,7 @@ Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／�
 
 也可安裝 **Codex Ambient 個人外掛**，在 Codex 外掛清單管理，並用對話開啟預覽、切換背景、還原及選擇中英文。外掛載入時會自動啟動本機背景服務，不需要另開 Ambient EXE。
 
-外掛套件解壓縮後，以 PowerShell 執行 `Install-Plugin.ps1`，完成工作後重開 Codex。來源名稱為 **Codex Ambient · 本機外掛**。完整安裝與解除安裝方式見 [外掛說明](plugins/codex-ambient/README.md)。外掛是本機安裝，尚未上架公開外掛目錄。
+下載 [MCP 外掛安裝包 v0.4.0](https://github.com/firzenfu/codex-ambient/releases/download/v0.4.0/CodexAmbient-plugin-v0.4.0.zip)，完整解壓縮後，以 PowerShell 執行 `Install-Plugin.ps1`，完成工作後重開 Codex。來源名稱為 **Codex Ambient · 本機外掛**。完整安裝與解除安裝方式見 [外掛說明](plugins/codex-ambient/README.md)。外掛是本機安裝，尚未上架官方公開外掛目錄。
 
 **背景模式仍然必要：**外掛不能替已執行的 Codex 開啟偵錯連線。之後仍透過套件的 `Start-Codex.ps1` 或既有 **Codex + Ambient** 捷徑啟動 Codex；背景服務會在外掛 MCP 工作階段載入時啟動，不保證 App 開啟瞬間載入。一般啟動模式可以預覽，但不能套用背景。
 

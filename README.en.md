@@ -10,7 +10,7 @@ This is an unofficial, experimental appearance tool. It is not affiliated with O
 
 ## Download and use
 
-Download `CodexAmbient.exe` from [Releases](https://github.com/firzenfu/codex-ambient/releases). The executable is approximately 34 MB and includes Node.js. No separate Node.js installation, npm packages or administrator privileges are required.
+Download [CodexAmbient.exe (standalone v0.3.0)](https://github.com/firzenfu/codex-ambient/releases/download/v0.3.0/CodexAmbient.exe). The executable is approximately 34 MB and includes Node.js. No separate Node.js installation, npm packages or administrator privileges are required.
 
 Choose **English** in the language selector at the top right of the control panel. The interface, preview text and messages change immediately, without restarting your background or video. Your choice is saved automatically and restored the next time you open the tool. The EXE tray menu uses the same preference when you next open the menu.
 
@@ -29,7 +29,7 @@ Closing the preview window leaves Ambient in the system tray. Right-click its ic
 
 The **Codex Ambient personal plugin** appears in Codex's plugin directory and provides conversational controls for preview, presets, restore and language. Its helper starts automatically when Codex loads the plugin MCP session, so the plugin does not need a separately opened Ambient EXE.
 
-Extract the plugin ZIP and run `Install-Plugin.ps1` with PowerShell. Restart Codex after finishing your work, then find **Codex Ambient** under the **Codex Ambient · 本機外掛** local source. See the [plugin guide](plugins/codex-ambient/README.md) for installation and removal. The package has not been published to the public plugin directory.
+Download the [MCP plugin package v0.4.0](https://github.com/firzenfu/codex-ambient/releases/download/v0.4.0/CodexAmbient-plugin-v0.4.0.zip), extract the entire ZIP and run `Install-Plugin.ps1` with PowerShell. Restart Codex after finishing your work, then find **Codex Ambient** under the **Codex Ambient · 本機外掛** local source. See the [plugin guide](plugins/codex-ambient/README.md) for installation and removal. The package has not been published to the official public plugin directory.
 
 **Background mode is still required.** The plugin cannot enable debugging inside an already-running Codex. Continue launching Codex with the package's `Start-Codex.ps1` or the existing **Codex + Ambient** shortcut. The MCP session may load later than the app window. Ordinary Codex launches support preview but cannot apply a background.
 

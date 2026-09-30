@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 plugin — 2026-09-29
+## 0.4.0 plugin — 2026-09-30
 
 - Added a locally installable Codex plugin with a custom icon, bilingual description and five MCP tools: status, preview, preset apply, restore and language.
 - Bundles Node.js and the v0.3.0 helper. Starts the helper when the plugin session loads, shares settings with the EXE and reconnects when another session exits.
