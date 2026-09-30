@@ -7,42 +7,42 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
   <link rel="stylesheet" href="/style.css">
-  <script src="/runtime.js" defer></script><script src="/app.js" defer></script>
+  <script src="/runtime.js" defer></script><script src="/i18n.js" defer></script><script src="/app.js" defer></script>
 </head>
 <body>
-  <header><a class="brand" href="/"><span class="brand-icon">◒</span> ambient<span class="brand-sub">FOR CODEX</span></a><div class="connection"><i id="connection-dot"></i><span id="connection-label">正在偵測 Codex</span><button id="reconnect" class="quiet">重新偵測 ↻</button></div></header>
+  <header><a class="brand" href="/"><span class="brand-icon">◒</span> ambient<span class="brand-sub">FOR CODEX</span></a><div class="connection"><i id="connection-dot"></i><span id="connection-label"><span data-i18n="正在偵測 Codex">正在偵測 Codex</span></span><button id="reconnect" class="quiet"><span data-i18n="重新偵測 ↻">重新偵測 ↻</span></button></div><label class="language-control"><span data-i18n="語言">語言</span><select id="language" aria-label="語言" data-i18n-aria="語言"><option value="zh-Hant">繁體中文</option><option value="en">English</option></select></label></header>
   <main>
-    <div class="intro"><div><p class="eyebrow">A LITTLE ATMOSPHERE. A LITTLE MORE YOU.</p><h1>讓工作背景，流動起來。</h1><p class="subtitle">為 Codex 加上一點光、一點色彩，還有你的節奏。</p></div><span class="edition">WINDOWS / LOCAL EDITION <b>01</b></span></div>
+    <div class="intro"><div><p class="eyebrow">A LITTLE ATMOSPHERE. A LITTLE MORE YOU.</p><h1><span data-i18n="讓工作背景，流動起來。">讓工作背景，流動起來。</span></h1><p class="subtitle"><span data-i18n="為 Codex 加上一點光、一點色彩，還有你的節奏。">為 Codex 加上一點光、一點色彩，還有你的節奏。</span></p></div><span class="edition">WINDOWS / LOCAL EDITION <b>01</b></span></div>
     <div class="workspace">
-      <section class="preview-section" aria-label="背景預覽">
-        <div class="section-line"><span><i class="live-dot"></i> 即時預覽</span><div class="segmented"><button id="dark-preview" class="selected">深色</button><button id="light-preview">淺色</button></div></div>
+      <section class="preview-section" aria-label="背景預覽" data-i18n-aria="背景預覽">
+        <div class="section-line"><span><i class="live-dot"></i> <span data-i18n="即時預覽">即時預覽</span></span><div class="segmented"><button id="dark-preview" class="selected"><span data-i18n="深色">深色</span></button><button id="light-preview"><span data-i18n="淺色">淺色</span></button></div></div>
         <div id="preview" data-theme="dark">
           <div class="mock-app">
-            <aside class="mock-sidebar"><div class="mock-logo">⌘ <strong>Codex</strong></div><div class="mock-new">＋ 新對話</div><small>工作空間</small><div class="mock-active">◈ &nbsp; 一點新靈感</div><div>⌁ &nbsp; 讓想法成真</div><div>▧ &nbsp; 我的專案</div><div class="mock-bottom">◉ &nbsp; 專注於眼前</div></aside>
-            <div class="mock-main"><div class="mock-top">一點新靈感 <span>•••</span></div><div class="mock-center"><div class="spark">✳</div><h2>留一點空間，<br>給下一個好想法。</h2><p>你的工作，你的氛圍。</p></div><div class="mock-composer">接下來，想做什麼？<div><span>＋ &nbsp; ⌘ &nbsp; Codex</span><span class="send">↑</span></div></div><small class="mock-disclaimer">背景預覽示意 · 實際顯示依 Codex 版本而異</small></div>
+            <aside class="mock-sidebar"><div class="mock-logo">⌘ <strong>Codex</strong></div><div class="mock-new">＋ <span data-i18n="新對話">新對話</span></div><small><span data-i18n="工作空間">工作空間</span></small><div class="mock-active">◈ &nbsp; <span data-i18n="一點新靈感">一點新靈感</span></div><div>⌁ &nbsp; <span data-i18n="讓想法成真">讓想法成真</span></div><div>▧ &nbsp; <span data-i18n="我的專案">我的專案</span></div><div class="mock-bottom">◉ &nbsp; <span data-i18n="專注於眼前">專注於眼前</span></div></aside>
+            <div class="mock-main"><div class="mock-top"><span data-i18n="一點新靈感">一點新靈感</span> <span>•••</span></div><div class="mock-center"><div class="spark">✳</div><h2><span data-i18n="留一點空間，">留一點空間，</span><br><span data-i18n="給下一個好想法。">給下一個好想法。</span></h2><p><span data-i18n="你的工作，你的氛圍。">你的工作，你的氛圍。</span></p></div><div class="mock-composer"><span data-i18n="接下來，想做什麼？">接下來，想做什麼？</span><div><span>＋ &nbsp; ⌘ &nbsp; Codex</span><span class="send">↑</span></div></div><small class="mock-disclaimer"><span data-i18n="背景預覽示意 · 實際顯示依 Codex 版本而異">背景預覽示意 · 實際顯示依 Codex 版本而異</span></small></div>
           </div>
-          <div id="paused-badge" hidden>Ⅱ 動畫已暫停</div>
+          <div id="paused-badge" hidden><span data-i18n="Ⅱ 動畫已暫停">Ⅱ 動畫已暫停</span></div>
         </div>
-        <div class="preview-caption"><div><span id="effect-name">極光漫遊</span><span id="effect-description">緩慢流動的冷暖光暈</span></div><button id="pause" class="quiet">Ⅱ 暫停動畫</button></div>
-        <div class="presets" role="group" aria-label="背景效果">
-          <button class="preset selected" data-mode="aurora"><div class="swatch aurora"></div><span>極光漫遊</span><small>溫柔、流動</small></button>
-          <button class="preset" data-mode="ocean"><div class="swatch ocean"></div><span>深海呼吸</span><small>沉靜、通透</small></button>
-          <button class="preset" data-mode="stars"><div class="swatch stars"></div><span>星際留白</span><small>輕盈、遼闊</small></button>
-          <button class="preset" data-mode="media"><div class="swatch custom">＋</div><span>自己的風景</span><small>影片 / GIF / 圖片</small></button>
+        <div class="preview-caption"><div><span id="effect-name"><span data-i18n="極光漫遊">極光漫遊</span></span><span id="effect-description"><span data-i18n="緩慢流動的冷暖光暈">緩慢流動的冷暖光暈</span></span></div><button id="pause" class="quiet"><span data-i18n="Ⅱ 暫停動畫">Ⅱ 暫停動畫</span></button></div>
+        <div class="presets" role="group" aria-label="背景效果" data-i18n-aria="背景效果">
+          <button class="preset selected" data-mode="aurora"><div class="swatch aurora"></div><span><span data-i18n="極光漫遊">極光漫遊</span></span><small><span data-i18n="溫柔、流動">溫柔、流動</span></small></button>
+          <button class="preset" data-mode="ocean"><div class="swatch ocean"></div><span><span data-i18n="深海呼吸">深海呼吸</span></span><small><span data-i18n="沉靜、通透">沉靜、通透</span></small></button>
+          <button class="preset" data-mode="stars"><div class="swatch stars"></div><span><span data-i18n="星際留白">星際留白</span></span><small><span data-i18n="輕盈、遼闊">輕盈、遼闊</span></small></button>
+          <button class="preset" data-mode="media"><div class="swatch custom">＋</div><span><span data-i18n="自己的風景">自己的風景</span></span><small><span data-i18n="影片 / GIF / 圖片">影片 / GIF / 圖片</span></small></button>
         </div>
-        <p class="privacy-note">◌ &nbsp; 素材只在本機處理，無需帳號或 API 金鑰。</p>
+        <p class="privacy-note">◌ &nbsp; <span data-i18n="素材只在本機處理，無需帳號或 API 金鑰。">素材只在本機處理，無需帳號或 API 金鑰。</span></p>
       </section>
-      <section class="controls" aria-label="背景設定">
-        <div class="control-heading"><span class="eyebrow">MAKE IT YOURS</span><h2>調成剛剛好。</h2><p>讓背景陪襯你的思緒。</p></div>
-        <div class="slider-group"><label for="strength">背景強度 <output id="strength-value">35%</output></label><input id="strength" type="range" min="0" max="80" value="35"><div class="range-labels"><span>若隱若現</span><span>更鮮明</span></div></div>
-        <div class="slider-group"><label for="blur">柔焦 <output id="blur-value">3 px</output></label><input id="blur" type="range" min="0" max="20" value="3"><div class="range-labels"><span>清晰</span><span>朦朧</span></div></div>
-        <div class="slider-group"><label for="speed">流動速度 <output id="speed-value">1×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.05" value="1"><div class="range-labels"><span>慢一點</span><span>快一點</span></div></div>
-        <div id="media-controls" hidden><label class="upload" for="media-file"><span>↥</span><strong>選擇本機素材</strong><small>MP4、WebM、GIF、PNG、JPG、WebP · 20 MB 內</small></label><input type="file" id="media-file" accept="video/mp4,video/webm,image/gif,image/png,image/jpeg,image/webp" hidden><p id="media-name">尚未選擇素材</p><small>GIF 支援暫停；速度調整適用影片與程式動畫。</small></div>
-        <div class="apply-area"><label id="window-label" for="target" hidden>Codex 視窗</label><select id="target" hidden></select><button class="primary" id="apply">套用至 Codex <span>↗</span></button><div class="secondary-actions"><button id="save">儲存偏好</button><button id="restore">還原 Codex</button></div><p class="apply-hint">調整先在左側預覽，按下套用後才會修改 Codex。</p></div>
+      <section class="controls" aria-label="背景設定" data-i18n-aria="背景設定">
+        <div class="control-heading"><span class="eyebrow">MAKE IT YOURS</span><h2><span data-i18n="調成剛剛好。">調成剛剛好。</span></h2><p><span data-i18n="讓背景陪襯你的思緒。">讓背景陪襯你的思緒。</span></p></div>
+        <div class="slider-group"><label for="strength"><span data-i18n="背景強度">背景強度</span> <output id="strength-value">35%</output></label><input id="strength" type="range" min="0" max="80" value="35"><div class="range-labels"><span><span data-i18n="若隱若現">若隱若現</span></span><span><span data-i18n="更鮮明">更鮮明</span></span></div></div>
+        <div class="slider-group"><label for="blur"><span data-i18n="柔焦">柔焦</span> <output id="blur-value">3 px</output></label><input id="blur" type="range" min="0" max="20" value="3"><div class="range-labels"><span><span data-i18n="清晰">清晰</span></span><span><span data-i18n="朦朧">朦朧</span></span></div></div>
+        <div class="slider-group"><label for="speed"><span data-i18n="流動速度">流動速度</span> <output id="speed-value">1×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.05" value="1"><div class="range-labels"><span><span data-i18n="慢一點">慢一點</span></span><span><span data-i18n="快一點">快一點</span></span></div></div>
+        <div id="media-controls" hidden><label class="upload" for="media-file"><span>↥</span><strong><span data-i18n="選擇本機素材">選擇本機素材</span></strong><small><span data-i18n="MP4、WebM、GIF、PNG、JPG、WebP · 20 MB 內">MP4、WebM、GIF、PNG、JPG、WebP · 20 MB 內</span></small></label><input type="file" id="media-file" accept="video/mp4,video/webm,image/gif,image/png,image/jpeg,image/webp" hidden><p id="media-name"><span data-i18n="尚未選擇素材">尚未選擇素材</span></p><small><span data-i18n="GIF 支援暫停；速度調整適用影片與程式動畫。">GIF 支援暫停；速度調整適用影片與程式動畫。</span></small></div>
+        <div class="apply-area"><label id="window-label" for="target" hidden><span data-i18n="Codex 視窗">Codex 視窗</span></label><select id="target" hidden></select><button class="primary" id="apply"><span data-i18n="套用至 Codex">套用至 Codex</span> <span>↗</span></button><div class="secondary-actions"><button id="save"><span data-i18n="儲存偏好">儲存偏好</span></button><button id="restore"><span data-i18n="還原 Codex">還原 Codex</span></button></div><p class="apply-hint"><span data-i18n="調整先在左側預覽，按下套用後才會修改 Codex。">調整先在左側預覽，按下套用後才會修改 Codex。</span></p></div>
       </section>
     </div>
-    <div class="setup" id="setup"><span class="setup-number">01</span><div><h3>第一次使用？先連接你的 Codex。</h3><p>完成目前工作後，完全結束 Codex，再執行資料夾中的 <code>Start-Codex.ps1</code>，回來按「重新偵測」。</p><details><summary>連接方式與還原</summary><p>這是非官方的外觀工具，透過本機偵錯連線加入背景。偵錯介面能控制 App，請只在自己的電腦使用，並勿將 9223 連接埠轉送到網路。工具不修改 Codex 安裝檔，也不讀取對話或登入資料。按「還原 Codex」可移除背景；完全結束 App 並從原本捷徑重開，可關閉偵錯連線。更新或重新載入頁面後需重新套用。</p></details></div></div>
-    <footer><span>CODEX AMBIENT</span><span>一個可隨時還原的小改變。</span><span>v0.2.1 · 實驗版</span></footer>
+    <div class="setup" id="setup"><span class="setup-number">01</span><div><h3><span data-i18n="第一次使用？先連接你的 Codex。">第一次使用？先連接你的 Codex。</span></h3><p><span data-i18n="完成目前工作後，完全結束 Codex。在工具的系統匣選單選「啟動 Codex（背景模式）」，或執行原始碼資料夾中的 Start-Codex.ps1，再按「重新偵測」。">完成目前工作後，完全結束 Codex。在工具的系統匣選單選「啟動 Codex（背景模式）」，或執行原始碼資料夾中的 Start-Codex.ps1，再按「重新偵測」。</span></p><details><summary><span data-i18n="連接方式與還原">連接方式與還原</span></summary><p><span data-i18n="這是非官方的外觀工具，透過本機偵錯連線加入背景。偵錯介面能控制 App，請只在自己的電腦使用，並勿將 9223 連接埠轉送到網路。工具不修改 Codex 安裝檔，也不讀取對話或登入資料。按「還原 Codex」可移除背景；完全結束 App 並從原本捷徑重開，可關閉偵錯連線。更新或重新載入頁面後需重新套用。">這是非官方的外觀工具，透過本機偵錯連線加入背景。偵錯介面能控制 App，請只在自己的電腦使用，並勿將 9223 連接埠轉送到網路。工具不修改 Codex 安裝檔，也不讀取對話或登入資料。按「還原 Codex」可移除背景；完全結束 App 並從原本捷徑重開，可關閉偵錯連線。更新或重新載入頁面後需重新套用。</span></p></details></div></div>
+    <footer><span>CODEX AMBIENT</span><span><span data-i18n="一個可隨時還原的小改變。">一個可隨時還原的小改變。</span></span><span><span data-i18n="v0.2.2 · 實驗版">v0.2.2 · 實驗版</span></span></footer>
   </main>
   <div id="toast" role="status" aria-live="polite" hidden></div>
 </body>
