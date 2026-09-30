@@ -13,6 +13,21 @@ before(async () => {
   token = (await (await fetch(origin)).text()).match(/name="ambient-token" content="([a-f0-9]+)"/)[1];
 });
 after(() => child?.kill());
+test('language preference persists separately and accepts only supported languages', async () => {
+  const endpoint = origin + '/api/language';
+  const post = (language, extra = {}) => fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Ambient-Token': token, ...extra }, body: JSON.stringify({ language }) });
+  assert.deepEqual(await (await fetch(endpoint)).json(), { language: 'zh-Hant' });
+  assert.equal((await post('en', { 'X-Ambient-Token': 'wrong' })).status, 403);
+  assert.equal((await post('en', { Origin: 'https://attacker.example' })).status, 403);
+  assert.equal((await post('en')).status, 200);
+  assert.equal(JSON.parse(await readFile(settingsDir + '/ui.json', 'utf8')).language, 'en');
+  assert.equal((await post('unsupported')).status, 400);
+  assert.deepEqual(await (await fetch(endpoint)).json(), { language: 'en' });
+  assert.deepEqual(await (await fetch(origin + '/api/settings')).json(), defaults);
+  assert.equal((await fetch(origin + '/i18n.js')).status, 200);
+  await writeFile(settingsDir + '/ui.json', 'broken');
+  assert.deepEqual(await (await fetch(endpoint)).json(), { language: 'zh-Hant' });
+});
 test('serves the panel with frame and script restrictions', async () => {
   const r = await fetch(origin); assert.equal(r.status, 200);
   assert.equal(r.headers.get('x-frame-options'), 'DENY');
