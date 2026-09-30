@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codex-ambient",
+  "version": "0.4.0",
+  "description": "Local animated backgrounds and live preview for the Windows Codex app. Requires Codex background mode (local debugging).",
+  "author": { "name": "firzenfu" },
+  "homepage": "https://github.com/firzenfu/codex-ambient",
+  "repository": "https://github.com/firzenfu/codex-ambient",
+  "keywords": ["background", "ambient", "windows", "preview"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Codex Ambient",
+        "shortDescription": "動態背景與即時預覽 · Animated backgrounds",
+        "longDescription": "Windows 本機背景工具，支援極光、海洋、星空、影片與中英文預覽。外掛會自動啟動本機背景服務；Codex 仍須以背景模式啟動。Local Windows background controls with automatic helper startup. Requires Codex launched with local debugging; does not restart Codex or patch its files.",
+        "developerName": "firzenfu",
+        "category": "Productivity",
+        "capabilities": ["Read", "Write"],
+        "websiteURL": "https://github.com/firzenfu/codex-ambient",
+        "defaultPrompt": ["開啟 Ambient 背景預覽", "把 Codex 背景換成極光", "Show Ambient connection status"],
+        "brandColor": "#2F4C3B",
+        "composerIcon": "./assets/icon.svg",
+        "logo": "./assets/icon.svg"
+      }
+    }
+  }
+}

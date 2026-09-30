@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import http from 'node:http';
 import net from 'node:net';
 import { fileURLToPath } from 'node:url';
+import { pluginClient } from './plugin-client.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 // An isolated fake CDP discovery endpoint ensures tests never touch a real Codex window.
@@ -172,7 +173,26 @@ try {
   assert.equal(await page.locator('#codex-ambient-layer').count(), 0);
   await post('resume');
   assert.equal((await (await fetch(origin + '/api/status')).json()).autoResume.enabled, false);
+  // Run the distributable plugin against this same isolated CDP fixture.
+  const plugin = pluginClient(fileURLToPath(new URL('../dist/CodexAmbient-plugin-v0.4.0/plugins/codex-ambient/mcp-server.mjs', import.meta.url)), {
+    AMBIENT_PORT: '43130', AMBIENT_DEBUG_PORT: String(discovery.address().port),
+    AMBIENT_DATA_DIR: fileURLToPath(new URL(`../test-results/browser-settings-${process.pid}`, import.meta.url))
+  });
+  try {
+    await plugin.initialize();
+    assert.equal((await plugin.call('ambient_status')).structuredContent.connected, true);
+    assert.equal((await plugin.call('ambient_preview')).structuredContent.url, origin + '/');
+    const apply = await plugin.call('ambient_apply', { mode: 'ocean', strength: 32, targetId: fixtureTarget.id });
+    assert.ok(!apply.isError, JSON.stringify(apply));
+    assert.equal(await page.evaluate(() => window.__codexAmbient.mode), 'ocean');
+    assert.equal(await page.locator('#codex-ambient-layer').count(), 1);
+    assert.equal((await plugin.call('ambient_apply', { mode: 'stars', targetId: 'missing-window' })).isError, true);
+    assert.equal(await page.evaluate(() => window.__codexAmbient.mode), 'ocean');
+    assert.ok(!(await plugin.call('ambient_restore', { targetId: fixtureTarget.id })).isError);
+    assert.equal(await page.locator('#codex-ambient-layer').count(), 0);
+  } finally { await plugin.close(); }
+  assert.equal((await (await fetch(origin + '/api/identity')).json()).app, 'codex-ambient', 'plugin must leave a separately owned server running');
   assert.deepEqual(errors, []);
-  console.log('PASS: presets, pause, themes, offline messaging, image/GIF/video upload and pause, responsive layout, live CDP transport, desktop mount/switch/restore, no browser errors.');
+  console.log('PASS: presets, media, language, responsive layout, CDP mount/reload/restore, packaged MCP status/preview/apply/restore/target safety, no browser errors.');
 } finally { await browser.close(); testServer.kill(); discovery.close(); }
 

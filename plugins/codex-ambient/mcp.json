@@ -1,0 +1,15 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "codex_ambient": {
+      "type": "stdio",
+      "command": "cmd.exe",
+      "args": ["/d", "/c", "runtime\\node.exe", "mcp-server.mjs"],
+      "cwd": ".",
+      "env_vars": ["LOCALAPPDATA", "USERPROFILE", "SYSTEMROOT", "WINDIR"],
+      "env": { "NODE_OPTIONS": "", "NODE_PATH": "" },
+      "startup_timeout_sec": 20,
+      "tool_timeout_sec": 60
+    }
+  }
+}

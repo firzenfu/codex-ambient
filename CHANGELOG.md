@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 plugin — 2026-09-29
+
+- Added a locally installable Codex plugin with a custom icon, bilingual description and five MCP tools: status, preview, preset apply, restore and language.
+- Bundles Node.js and the v0.3.0 helper. Starts the helper when the plugin session loads, shares settings with the EXE and reconnects when another session exits.
+- Added a PowerShell installer using Codex's native marketplace and plugin commands; no hooks, hook trust changes or application restarts.
+- Uses the compatibility manifest format after verifying that this Codex build reads portable metadata but does not load the portable local MCP server.
+- Verified native Codex discovery of all five tools, 20 unit/integration tests and packaged MCP apply/restore against an isolated browser fixture.
+- Main-window backgrounds still require the existing local debugging launch mode. Local installation does not publish to the public plugin directory. The standalone EXE remains v0.3.0.
+
 ## 0.3.0 — 2026-09-29
 
 - Added a Codex + Ambient desktop shortcut and silent one-click launch.

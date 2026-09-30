@@ -25,6 +25,16 @@ Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／�
 
 關閉預覽視窗後工具會留在系統匣。右鍵可以重新開啟預覽或「離開工具」。退出只會停止工具自己啟動的控制台服務，不會終止 Codex。
 
+## Codex 外掛（v0.4.0）
+
+也可安裝 **Codex Ambient 個人外掛**，在 Codex 外掛清單管理，並用對話開啟預覽、切換背景、還原及選擇中英文。外掛載入時會自動啟動本機背景服務，不需要另開 Ambient EXE。
+
+外掛套件解壓縮後，以 PowerShell 執行 `Install-Plugin.ps1`，完成工作後重開 Codex。來源名稱為 **Codex Ambient · 本機外掛**。完整安裝與解除安裝方式見 [外掛說明](plugins/codex-ambient/README.md)。外掛是本機安裝，尚未上架公開外掛目錄。
+
+**背景模式仍然必要：**外掛不能替已執行的 Codex 開啟偵錯連線。之後仍透過套件的 `Start-Codex.ps1` 或既有 **Codex + Ambient** 捷徑啟動 Codex；背景服務會在外掛 MCP 工作階段載入時啟動，不保證 App 開啟瞬間載入。一般啟動模式可以預覽，但不能套用背景。
+
+從原始碼執行 `npm run build:plugin` 可產生內附 Node 的 Windows x64 ZIP。外掛目前採用已在 Codex 26.928 驗證的 `.codex-plugin/plugin.json` 與 `.mcp.json` 相容格式；原始碼中的 portable manifest 是建置輸入。
+
 ## 一鍵啟動（v0.3.0）
 
 先開啟 EXE 一次，在系統匣圖示按右鍵，選「**建立一鍵啟動捷徑**」。之後日常使用桌面的 **Codex + Ambient**：會啟動本機服務及背景模式 Codex，自動恢復上次套用或儲存的背景，不彈出控制台。重複點擊會沿用正在執行的工具。
@@ -46,7 +56,7 @@ Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／�
 - 原始碼啟動方式的設定存於專案的 `data/settings.json`。
 - 語言偏好另存於同一設定資料夾的 `ui.json`，切換語言不會改動背景偏好。
 - 套用或儲存的素材會保存在本機設定檔中，不上傳；編碼前單一素材上限 20 MB。
-- 不修改 `app.asar`、Codex 設定檔、對話或登入資料。
+- 不修改 `app.asar`、對話或登入資料；外掛安裝會透過 Codex CLI 註冊外掛來源與啟用設定。
 
 ## 相容性與限制
 

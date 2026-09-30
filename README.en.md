@@ -25,6 +25,16 @@ You can also open `http://127.0.0.1:43127/` in Codex's built-in browser to use t
 
 Closing the preview window leaves Ambient in the system tray. Right-click its icon to reopen the preview or choose **離開工具** (Quit). Quitting stops only the control-panel server started by the tool; it does not terminate Codex.
 
+## Codex plugin (v0.4.0)
+
+The **Codex Ambient personal plugin** appears in Codex's plugin directory and provides conversational controls for preview, presets, restore and language. Its helper starts automatically when Codex loads the plugin MCP session, so the plugin does not need a separately opened Ambient EXE.
+
+Extract the plugin ZIP and run `Install-Plugin.ps1` with PowerShell. Restart Codex after finishing your work, then find **Codex Ambient** under the **Codex Ambient · 本機外掛** local source. See the [plugin guide](plugins/codex-ambient/README.md) for installation and removal. The package has not been published to the public plugin directory.
+
+**Background mode is still required.** The plugin cannot enable debugging inside an already-running Codex. Continue launching Codex with the package's `Start-Codex.ps1` or the existing **Codex + Ambient** shortcut. The MCP session may load later than the app window. Ordinary Codex launches support preview but cannot apply a background.
+
+Run `npm run build:plugin` to build the Windows x64 ZIP with its bundled Node runtime. The release uses the `.codex-plugin/plugin.json` and `.mcp.json` compatibility layout verified with Codex 26.928; the portable source manifest is a build input. The standalone EXE and helper remain v0.3.0.
+
 ## One-click launch (v0.3.0)
 
 Open the EXE once, then right-click its tray icon and choose **Create one-click shortcut**. Use the new **Codex + Ambient** desktop shortcut for everyday launches. It starts the local helper and Codex in background mode, then restores your last applied or saved background without opening the control panel. Repeated clicks reuse the running helper.
@@ -46,7 +56,7 @@ For scripts, use `CodexAmbient.exe --launch-codex`. Use `CodexAmbient.exe --crea
 - When running from source, settings are stored in the project's `data/settings.json`.
 - The saved background and local media are stored in `settings.json`. The language preference is stored separately in `ui.json` in the same settings directory, so changing it preserves your background preferences.
 - Applied or saved media is stored locally inside the settings file and is never uploaded. Files are limited to 20 MB before encoding.
-- The tool does not modify `app.asar`, Codex configuration files, conversations or sign-in data.
+- The tool does not modify `app.asar`, conversations or sign-in data. Plugin installation registers its marketplace and enablement settings through the Codex CLI.
 
 ## Compatibility and limitations
 
