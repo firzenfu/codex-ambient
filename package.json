@@ -1,0 +1,9 @@
+{
+  "name": "codex-ambient",
+  "version": "0.2.1",
+  "private": true,
+  "type": "module",
+  "description": "Local, reversible animated backgrounds for the Windows Codex desktop app",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server.mjs", "test": "node --test tests/*.test.mjs", "build:exe": "node packaging/build.mjs" }
+}

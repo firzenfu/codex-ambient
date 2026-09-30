@@ -1,0 +1,9 @@
+data/
+test-results/
+node_modules/
+build/
+dist/
+*.log
+*.pid
+.env
+.env.*
