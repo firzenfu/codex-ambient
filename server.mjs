@@ -6,6 +6,8 @@ import { randomBytes } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { defaults, validateConfig } from './lib/config.mjs';
 import { targets, evaluate, selectTarget } from './lib/cdp.mjs';
+import { preferences } from './lib/preferences.mjs';
+import { BackgroundResume } from './lib/resume.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dataRoot = process.env.AMBIENT_DATA_DIR ? path.resolve(process.env.AMBIENT_DATA_DIR) : path.join(root, 'data');
@@ -19,6 +21,8 @@ function openPanel() {
 }
 const runtime = await readFile(path.join(root, 'public/runtime.js'), 'utf8');
 let applied = null, busy = false;
+const savedPreferences = preferences(dataRoot);
+const resume = new BackgroundResume({ list: () => targets(debugPort), evaluate, runtime });
 const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Referrer-Policy': 'no-referrer' };
 function json(res, status, data) { res.writeHead(status, { ...headers, 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }
 async function body(req) {
@@ -31,8 +35,7 @@ async function body(req) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 async function settings() {
-  try { return validateConfig({ ...defaults, ...JSON.parse(await readFile(path.join(dataRoot, 'settings.json'), 'utf8')), media: null }); }
-  catch { return { ...defaults }; }
+  return (await savedPreferences.load()).config;
 }
 async function uiLanguage() {
   try { const saved = JSON.parse(await readFile(path.join(dataRoot, 'ui.json'), 'utf8')); return saved.language === 'en' ? 'en' : 'zh-Hant'; }
@@ -42,20 +45,26 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.headers.host !== `127.0.0.1:${port}` || (req.headers.origin && req.headers.origin !== origin)) return json(res, 403, { error: '只接受本機控制台請求' });
     const url = new URL(req.url, origin);
-    if (req.method === 'GET' && url.pathname === '/api/identity') return json(res, 200, { app: 'codex-ambient', version: '0.2.2' });
+    if (req.method === 'GET' && url.pathname === '/api/identity') return json(res, 200, { app: 'codex-ambient', version: '0.3.0' });
     if (req.method === 'GET' && url.pathname === '/api/status') {
       let windows = [], connected = false;
       try { windows = await targets(debugPort); connected = windows.length > 0; } catch {}
-      return json(res, 200, { connected, windows: windows.map(({ id, title }) => ({ id, title })), applied, debugPort });
+      return json(res, 200, { connected, windows: windows.map(({ id, title }) => ({ id, title })), applied, debugPort, autoResume: { armed: resume.armed, enabled: !!resume.config, error: resume.error } });
     }
     if (req.method === 'GET' && url.pathname === '/api/language') return json(res, 200, { language: await uiLanguage() });
     if (req.method === 'GET' && url.pathname === '/api/settings') return json(res, 200, await settings());
-    if (req.method === 'POST' && ['/api/apply', '/api/restore', '/api/save', '/api/language'].includes(url.pathname)) {
+    if (req.method === 'POST' && ['/api/apply', '/api/restore', '/api/save', '/api/language', '/api/resume'].includes(url.pathname)) {
       if (req.headers['x-ambient-token'] !== token || !req.headers['content-type']?.startsWith('application/json')) return json(res, 403, { error: '控制台已過期，請重新整理' });
       if (busy) return json(res, 409, { error: '正在處理，請稍後再試' });
       busy = true;
       try {
         const input = await body(req);
+        if (url.pathname === '/api/resume') {
+          const saved = await savedPreferences.load();
+          resume.set(saved.resumeEnabled ? saved.config : null);
+          resume.armed = true;
+          return json(res, 200, { ok: true, enabled: !!resume.config });
+        }
         if (url.pathname === '/api/language') {
           if (!['zh-Hant', 'en'].includes(input.language)) return json(res, 400, { error: 'Invalid language' });
           await mkdir(dataRoot, { recursive: true });
@@ -66,18 +75,16 @@ const server = http.createServer(async (req, res) => {
         }
         const config = url.pathname === '/api/restore' ? null : validateConfig(input.config);
         if (url.pathname === '/api/save') {
-          await mkdir(dataRoot, { recursive: true });
-          const temporary = path.join(dataRoot, 'settings.json.tmp');
-          await writeFile(temporary, JSON.stringify({ ...config, mode: config.mode === 'media' ? 'aurora' : config.mode, media: null }, null, 2));
-          await rename(temporary, path.join(dataRoot, 'settings.json'));
+          await savedPreferences.save(config);
           return json(res, 200, { ok: true });
         }
         let list;
         try { list = await targets(debugPort); } catch { throw new Error('尚未連接 Codex。請完全結束 Codex 後，執行 Start-Codex.ps1，再按「重新偵測」。'); }
         const target = selectTarget(list, input.targetId);
-        const expression = `(() => { ${runtime}\n return installAmbient(${JSON.stringify(config)}); })()`;
-        const result = await evaluate(target.socket, expression);
-        if (!result?.ok) throw new Error('Codex 未確認套用結果');
+        // The HTTP handler and auto-resume poll share the busy gate.
+        const result = await resume.apply(target, config);
+        await savedPreferences.save(config || await settings(), config !== null);
+        resume.set(config);
         applied = config ? { mode: config.mode, targetId: target.id, at: new Date().toISOString() } : null;
         return json(res, 200, result);
       } finally { busy = false; }
@@ -92,6 +99,22 @@ const server = http.createServer(async (req, res) => {
   } catch (error) { json(res, 400, { error: error.message || '操作失敗' }); }
 });
 server.requestTimeout = 30000;
+const resumeTimer = setInterval(async () => {
+  if (busy || !resume.armed || !resume.config) return;
+  // Offline discovery must not lock out the user's save/language controls.
+  let windows;
+  try { windows = await targets(debugPort); }
+  catch (error) { resume.error = error.message; return; }
+  if (busy) return;
+  busy = true;
+  try { await resume.tick(windows); } finally { busy = false; }
+}, 2000);
+resumeTimer.unref();
+// A launcher crash must not leave an orphan server holding the control-panel port.
+const parentPid = Number(process.env.AMBIENT_PARENT_PID);
+if (Number.isSafeInteger(parentPid) && parentPid > 0) {
+  setInterval(() => { try { process.kill(parentPid, 0); } catch (error) { if (error.code === 'ESRCH') process.exit(0); } }, 2000).unref();
+}
 server.on('error', async error => {
   if (error.code === 'EADDRINUSE' && process.argv.includes('--open')) {
     try {

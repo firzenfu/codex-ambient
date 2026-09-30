@@ -34,8 +34,8 @@ test('serves the panel with frame and script restrictions', async () => {
   assert.match(r.headers.get('content-security-policy'), /script-src 'self'/);
 });
 test('rejects cross-site and unauthenticated modifications', async () => {
-  for (const extra of [{}, { Origin: 'https://attacker.example', 'X-Ambient-Token': token }]) {
-    const r = await fetch(origin + '/api/restore', { method: 'POST', headers: { 'Content-Type': 'application/json', ...extra }, body: '{}' });
+  for (const endpoint of ['/api/restore', '/api/resume']) for (const extra of [{}, { Origin: 'https://attacker.example', 'X-Ambient-Token': token }]) {
+    const r = await fetch(origin + endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', ...extra }, body: '{}' });
     assert.equal(r.status, 403);
   }
 });

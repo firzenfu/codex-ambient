@@ -25,15 +25,27 @@ You can also open `http://127.0.0.1:43127/` in Codex's built-in browser to use t
 
 Closing the preview window leaves Ambient in the system tray. Right-click its icon to reopen the preview or choose **離開工具** (Quit). Quitting stops only the control-panel server started by the tool; it does not terminate Codex.
 
+## One-click launch (v0.3.0)
+
+Open the EXE once, then right-click its tray icon and choose **Create one-click shortcut**. Use the new **Codex + Ambient** desktop shortcut for everyday launches. It starts the local helper and Codex in background mode, then restores your last applied or saved background without opening the control panel. Repeated clicks reuse the running helper.
+
+Use **Open background preview** from the tray menu when you want to change the effect. **Apply to Codex** also saves it for future launches. **Save preferences** saves the next-launch choice without changing the current background. Selected media is saved locally with the settings, so it can resume after a restart. Media selected in older versions must be selected and saved once in this version.
+
+While one-click mode is active, background reconnection and page reloads are handled automatically. Existing playback is left running. **Restore Codex** disables automatic restoration until you apply or save a background again and launch it as appropriate.
+
+If Codex is already running in ordinary mode, finish your work and fully exit it once, then use the new shortcut. The tool never force-closes Codex. Its original shortcut continues to launch ordinary mode. There is no Windows sign-in startup task. Keep the EXE at the shortcut's target location, or recreate the shortcut after moving it.
+
+For scripts, use `CodexAmbient.exe --launch-codex`. Use `CodexAmbient.exe --create-shortcut` to create the desktop shortcut. Running the EXE without arguments opens the control panel.
+
 ## Restore and data locations
 
 - Click **還原 Codex** (Restore Codex) to remove the selected window's background layer, styles, animations and event listeners.
-- Reloading the Codex page or fully exiting the app also clears the background. Apply it again afterward if desired.
+- Reloading the Codex page clears its injected layer; one-click mode restores it automatically while the helper is running.
 - To close the debugging interface, fully exit Codex and reopen it using its original shortcut.
 - The EXE extracts its runtime to `%LOCALAPPDATA%/CodexAmbient/engine-…` and stores settings in `%LOCALAPPDATA%/CodexAmbient/settings/`.
 - When running from source, settings are stored in the project's `data/settings.json`.
-- The language preference is stored separately in `ui.json` in the same settings directory, so changing it preserves your background preferences.
-- Media is processed in memory and is not uploaded. Select it again when you next open the control panel.
+- The saved background and local media are stored in `settings.json`. The language preference is stored separately in `ui.json` in the same settings directory, so changing it preserves your background preferences.
+- Applied or saved media is stored locally inside the settings file and is never uploaded. Files are limited to 20 MB before encoding.
 - The tool does not modify `app.asar`, Codex configuration files, conversations or sign-in data.
 
 ## Compatibility and limitations
@@ -46,7 +58,7 @@ Closing the preview window leaves Ambient in the system tray. Right-click its ic
 - Some code blocks, menus and side panels keep their original background colors. A background strength of 20–40% is suggested; reapply after switching between light and dark themes.
 - Media files are limited to 20 MB. Supported formats are MP4, WebM, GIF, PNG, JPG and WebP. Video codecs must also be supported by the app.
 - GIFs can be paused but cannot have their speed changed. Speed controls apply to generated animations and videos. The tool respects the system's reduced-motion setting and pauses animations when the page is hidden.
-- No automatic startup or automatic injection. The EXE is not code-signed; releases include a SHA-256 checksum file.
+- Automatic restoration is enabled by the one-click launcher or the tray launch command, with no Windows sign-in startup task. The EXE is not code-signed; releases include a SHA-256 checksum file.
 
 ## Run from source
 

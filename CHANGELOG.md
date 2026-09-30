@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — 2026-09-29
+
+- Added a Codex + Ambient desktop shortcut and silent one-click launch.
+- Automatically restores saved backgrounds after launch, reconnects and page reloads without restarting existing playback.
+- Saves selected media locally; Restore disables automatic reapplication.
+- Reuses the running helper and stops orphan helpers after their launcher exits.
+- Added persistence, recovery, authenticated resume and real CDP relay integration tests against an isolated browser fixture.
+
 ## 0.2.2 — 2026-09-29
 
 - Added an English / Traditional Chinese selector with automatic preference persistence.

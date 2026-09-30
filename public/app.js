@@ -102,7 +102,7 @@ for (const action of ['apply', 'restore', 'save']) $(action).addEventListener('c
   try {
     if (action !== 'restore' && config.mode === 'media' && !config.media) throw new Error('請先選擇本機素材');
     const result = await request('/api/' + action, { config, targetId: $('target').value });
-    toast(action === 'apply' ? `已套用至 Codex${result.reducedMotion ? '（依系統設定減少動畫）' : ''}。` : action === 'restore' ? '已移除 Codex 動態背景。' : '已儲存偏好；本機素材需在下次開啟時重新選擇。');
+    toast(action === 'apply' ? `已套用至 Codex${result.reducedMotion ? '（依系統設定減少動畫）' : ''}。` : action === 'restore' ? '已移除 Codex 動態背景。' : '已儲存偏好與素材，下次一鍵啟動時會恢復。');
     if (action !== 'save') await detect();
   } catch (e) { toast(e.message, true); }
   finally { buttons.forEach(b => { b.disabled = false; }); }

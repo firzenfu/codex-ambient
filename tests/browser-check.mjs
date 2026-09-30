@@ -5,11 +5,27 @@ import assert from 'node:assert/strict';
 import { evaluate } from '../lib/cdp.mjs';
 import { spawn } from 'node:child_process';
 import http from 'node:http';
+import net from 'node:net';
 import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 // An isolated fake CDP discovery endpoint ensures tests never touch a real Codex window.
-const discovery = http.createServer((req, res) => { res.writeHead(503); res.end('Offline fixture'); });
+let fixtureDiscovery = null;
+const discovery = http.createServer((req, res) => {
+  if (!fixtureDiscovery) { res.writeHead(503); res.end('Offline fixture'); }
+  else { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify([fixtureDiscovery])); }
+});
+// Relay only the isolated test page's websocket, never a real Codex target.
+discovery.on('upgrade', (request, socket, head) => {
+  if (!fixtureDiscovery || request.url !== new URL(fixtureDiscovery.webSocketDebuggerUrl).pathname) { socket.destroy(); return; }
+  const upstream = net.connect(9334, '127.0.0.1', () => {
+    upstream.write(`${request.method} ${request.url} HTTP/1.1\r\n${Object.entries(request.headers).map(([k,v]) => `${k}: ${v}`).join('\r\n')}\r\n\r\n`);
+    if (head.length) upstream.write(head);
+    socket.pipe(upstream); upstream.pipe(socket);
+  });
+  socket.on('error', () => upstream.destroy()); upstream.on('error', () => socket.destroy());
+  socket.on('close', () => upstream.destroy()); upstream.on('close', () => socket.destroy());
+});
 await new Promise(resolve => discovery.listen(0, '127.0.0.1', resolve));
 const testServer = spawn(process.execPath, ['server.mjs'], {
   cwd: new URL('..', import.meta.url),
@@ -132,6 +148,30 @@ try {
     return { mounted, style, animations, layersAfter: document.querySelectorAll('#codex-ambient-layer').length, styleAfter: document.querySelectorAll('#codex-ambient-style').length, animationsAfter: document.getAnimations().length, markerAfter: document.documentElement.hasAttribute('data-codex-ambient'), original: document.body.getAttribute('style'), text: document.querySelector('main').textContent };
   });
   assert.deepEqual(result, { mounted: 1, style: 1, animations: 3, layersAfter: 0, styleAfter: 0, animationsAfter: 0, markerAfter: false, original: 'background:red', text: 'Unchanged application content' });
+  fixtureDiscovery = { ...fixtureTarget, url: 'app://-/', webSocketDebuggerUrl: fixtureTarget.webSocketDebuggerUrl.replace(':9334/', `:${discovery.address().port}/`) };
+  const origin = 'http://127.0.0.1:43130';
+  const apiToken = (await (await fetch(origin)).text()).match(/name="ambient-token" content="([a-f0-9]+)"/)[1];
+  async function post(action, input = {}) {
+    for (let attempt = 0; ; attempt++) {
+      const reply = await fetch(origin + '/api/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Ambient-Token': apiToken }, body: JSON.stringify(input) });
+      if (reply.status === 409 && attempt < 10) { await new Promise(resolve => setTimeout(resolve, 200)); continue; }
+      assert.equal(reply.status, 200, await reply.text()); return;
+    }
+  }
+  await post('save', { config: { mode: 'media', strength: 35, blur: 0, speed: 1, paused: false, media: { name: 'saved.png', data: 'data:image/png;base64,' + png.toString('base64') } } });
+  await post('resume');
+  await page.locator('#codex-ambient-layer img').waitFor();
+  const beforePoll = await page.locator('#codex-ambient-layer img').elementHandle();
+  await page.waitForTimeout(2500);
+  assert.equal(await beforePoll.evaluate(el => el === document.querySelector('#codex-ambient-layer img')), true);
+  await page.reload();
+  await page.setContent('<div id="root">Reloaded shell</div>');
+  await page.locator('#codex-ambient-layer img').waitFor();
+  await post('restore', { targetId: fixtureTarget.id });
+  await page.waitForTimeout(2500);
+  assert.equal(await page.locator('#codex-ambient-layer').count(), 0);
+  await post('resume');
+  assert.equal((await (await fetch(origin + '/api/status')).json()).autoResume.enabled, false);
   assert.deepEqual(errors, []);
   console.log('PASS: presets, pause, themes, offline messaging, image/GIF/video upload and pause, responsive layout, live CDP transport, desktop mount/switch/restore, no browser errors.');
 } finally { await browser.close(); testServer.kill(); discovery.close(); }

@@ -9,6 +9,8 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -17,8 +19,8 @@ using System.Windows.Forms;
 [assembly: AssemblyTitle("Codex Ambient")]
 [assembly: AssemblyDescription("Animated backgrounds and live preview for Codex")]
 [assembly: AssemblyProduct("Codex Ambient")]
-[assembly: AssemblyVersion("0.2.2.0")]
-[assembly: AssemblyFileVersion("0.2.2.0")]
+[assembly: AssemblyVersion("0.3.0.0")]
+[assembly: AssemblyFileVersion("0.3.0.0")]
 
 internal static class Program
 {
@@ -28,17 +30,20 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         string data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CodexAmbient");
-        bool smoke = false;
+        bool smoke = false, launchCodex = false, createShortcut = false;
         int port = 43127;
         for (int i = 0; i < args.Length; i++)
         {
             if (args[i] == "--data-dir" && i + 1 < args.Length) data = Path.GetFullPath(args[++i]);
+            else if (args[i] == "--launch-codex") launchCodex = true;
+            else if (args[i] == "--create-shortcut") createShortcut = true;
             else if (args[i] == "--smoke-test") { smoke = true; port = 43129; }
         }
         UiText.Initialize(data);
         try
         {
             Directory.CreateDirectory(data);
+            if (createShortcut) { DesktopShortcut.Create(); return 0; }
             if (smoke)
             {
                 using (var service = new AmbientService(data, port))
@@ -65,12 +70,17 @@ internal static class Program
                     using (var running = new AmbientService(data, port))
                     {
                         var identity = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(running.Read("/api/identity"));
-                        if (identity == null || !identity.ContainsKey("version") || Convert.ToString(identity["version"]) != "0.2.2")
+                        if (identity == null || !identity.ContainsKey("version") || Convert.ToString(identity["version"]) != "0.3.0")
                             throw new Exception(UiText.T("舊版 Ambient 仍在執行。請從系統匣離開舊版工具，再開啟新版。", "An older Ambient version is running. Quit the old tool from its tray menu, then open the new version."));
                     }
-                    AmbientService.OpenPreview("http://127.0.0.1:43127/"); return 0;
+                    if (launchCodex)
+                    {
+                        using (var running = new AmbientService(data, port)) { running.StartCodex(); running.EnableResume(); }
+                    }
+                    else AmbientService.OpenPreview("http://127.0.0.1:43127/");
+                    return 0;
                 }
-                try { Application.Run(new AmbientContext(data, port)); }
+                try { Application.Run(new AmbientContext(data, port, launchCodex)); }
                 finally { mutex.ReleaseMutex(); }
             }
             return 0;
@@ -92,7 +102,7 @@ internal sealed class AmbientContext : ApplicationContext
     private bool opening;
     private bool disposed;
 
-    public AmbientContext(string data, int port)
+    public AmbientContext(string data, int port, bool launchCodex)
     {
         service = new AmbientService(data, port);
         dispatcher = new Form();
@@ -100,6 +110,10 @@ internal sealed class AmbientContext : ApplicationContext
         var menu = new ContextMenuStrip();
         menu.Items.Add(UiText.T("開啟背景預覽", "Open background preview"), null, delegate { Open(); });
         menu.Items.Add(UiText.T("啟動 Codex（背景模式）", "Start Codex (background mode)"), null, delegate { LaunchCodex(); });
+        menu.Items.Add(UiText.T("建立一鍵啟動捷徑", "Create one-click shortcut"), null, delegate {
+            try { string shortcut = DesktopShortcut.Create(); MessageBox.Show(UiText.T("已建立捷徑：\n", "Shortcut created:\n") + shortcut, "Codex Ambient"); }
+            catch (Exception error) { MessageBox.Show(error.Message, "Codex Ambient", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+        });
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(UiText.T("離開工具", "Quit"), null, delegate { ExitThread(); });
         tray = new NotifyIcon {
@@ -109,11 +123,12 @@ internal sealed class AmbientContext : ApplicationContext
         menu.Opening += delegate {
             menu.Items[0].Text = UiText.T("開啟背景預覽", "Open background preview");
             menu.Items[1].Text = UiText.T("啟動 Codex（背景模式）", "Start Codex (background mode)");
-            menu.Items[3].Text = UiText.T("離開工具", "Quit");
+            menu.Items[2].Text = UiText.T("建立一鍵啟動捷徑", "Create one-click shortcut");
+            menu.Items[4].Text = UiText.T("離開工具", "Quit");
             tray.Text = UiText.T("Codex Ambient · 雙擊開啟預覽", "Codex Ambient · Double-click to preview");
         };
         tray.DoubleClick += delegate { Open(); };
-        Open();
+        if (launchCodex) LaunchCodex(); else Open();
     }
     private void Dispatch(Action action)
     {
@@ -147,8 +162,9 @@ internal sealed class AmbientContext : ApplicationContext
             try
             {
                 service.EnsureStarted();
-                string result = service.StartCodex();
-                Dispatch(() => { opening = false; MessageBox.Show(result, "Codex Ambient", MessageBoxButtons.OK, MessageBoxIcon.Information); });
+                service.StartCodex();
+                service.EnableResume();
+                Dispatch(() => { opening = false; tray.Text = UiText.T("Codex Ambient · 自動恢復背景", "Codex Ambient · Auto-resume active"); });
             }
             catch (Exception error) { Dispatch(() => { opening = false; MessageBox.Show(error.Message, "Codex Ambient", MessageBoxButtons.OK, MessageBoxIcon.Warning); }); }
         });
@@ -187,7 +203,7 @@ internal sealed class AmbientService : IDisposable
         try { identity = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(Read("/api/identity")); }
         catch { return false; }
         if (identity == null || !identity.ContainsKey("app") || Convert.ToString(identity["app"]) != "codex-ambient") return false;
-        if (!identity.ContainsKey("version") || Convert.ToString(identity["version"]) != "0.2.2")
+        if (!identity.ContainsKey("version") || Convert.ToString(identity["version"]) != "0.3.0")
             throw new Exception(UiText.T("舊版 Ambient 仍在執行。請從系統匣離開舊版工具，再開啟新版。", "An older Ambient version is running. Quit the old tool from its tray menu, then open the new version."));
         return true;
     }
@@ -208,6 +224,7 @@ internal sealed class AmbientService : IDisposable
             Environment.SetEnvironmentVariable("NODE_OPTIONS", null);
             Environment.SetEnvironmentVariable("NODE_PATH", null);
             Environment.SetEnvironmentVariable("AMBIENT_PORT", port.ToString());
+            Environment.SetEnvironmentVariable("AMBIENT_PARENT_PID", Process.GetCurrentProcess().Id.ToString());
             Environment.SetEnvironmentVariable("AMBIENT_DATA_DIR", Path.Combine(data, "settings"));
             server = new Process { StartInfo = info, EnableRaisingEvents = true };
             server.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e) { Log(e.Data); };
@@ -262,6 +279,34 @@ internal sealed class AmbientService : IDisposable
         var info = new ProcessStartInfo(Path.Combine(EnginePath, "node.exe"), "--version") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true };
         Environment.SetEnvironmentVariable("NODE_OPTIONS", null);
         using (Process p = Process.Start(info)) { string result = p.StandardOutput.ReadToEnd(); p.WaitForExit(); if (p.ExitCode != 0) throw new Exception("Bundled Node failed."); return result.Trim(); }
+    }
+    public void EnableResume()
+    {
+        string panel = Read("/");
+        var token = Regex.Match(panel, "name=\"ambient-token\" content=\"([a-f0-9]+)\"");
+        if (!token.Success) throw new Exception("Invalid control-panel response.");
+        for (int attempt = 0; ; attempt++)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(Origin + "/api/resume");
+            request.Proxy = null; request.Method = "POST"; request.ContentType = "application/json";
+            request.Headers["X-Ambient-Token"] = token.Groups[1].Value;
+            request.Timeout = 5000; request.ReadWriteTimeout = 5000; request.AllowAutoRedirect = false;
+            byte[] bytes = Encoding.UTF8.GetBytes("{}"); request.ContentLength = bytes.Length;
+            try
+            {
+                using (var output = request.GetRequestStream()) output.Write(bytes, 0, bytes.Length);
+                using (var response = request.GetResponse()) { }
+                return;
+            }
+            catch (WebException error)
+            {
+                var response = error.Response as HttpWebResponse;
+                bool retry = response != null && response.StatusCode == HttpStatusCode.Conflict && attempt < 10;
+                if (response != null) response.Dispose();
+                if (!retry) throw;
+                Thread.Sleep(500);
+            }
+        }
     }
     public string StartCodex()
     {
@@ -338,5 +383,32 @@ internal static class UiText
         }
         catch { }
         return chinese;
+    }
+}
+
+internal static class DesktopShortcut
+{
+    public static string Create()
+    {
+        string destination = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Codex + Ambient.lnk");
+        object shell = Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell"));
+        object shortcut = null;
+        try
+        {
+            shortcut = shell.GetType().InvokeMember("CreateShortcut", BindingFlags.InvokeMethod, null, shell, new object[] { destination });
+            var type = shortcut.GetType();
+            type.InvokeMember("TargetPath", BindingFlags.SetProperty, null, shortcut, new object[] { Application.ExecutablePath });
+            type.InvokeMember("Arguments", BindingFlags.SetProperty, null, shortcut, new object[] { "--launch-codex" });
+            type.InvokeMember("WorkingDirectory", BindingFlags.SetProperty, null, shortcut, new object[] { Path.GetDirectoryName(Application.ExecutablePath) });
+            type.InvokeMember("IconLocation", BindingFlags.SetProperty, null, shortcut, new object[] { Application.ExecutablePath + ",0" });
+            type.InvokeMember("Description", BindingFlags.SetProperty, null, shortcut, new object[] { "Start Codex and restore your Ambient background" });
+            type.InvokeMember("Save", BindingFlags.InvokeMethod, null, shortcut, null);
+            return destination;
+        }
+        finally
+        {
+            if (shortcut != null) Marshal.FinalReleaseComObject(shortcut);
+            Marshal.FinalReleaseComObject(shell);
+        }
     }
 }
