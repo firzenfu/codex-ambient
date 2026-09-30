@@ -12,6 +12,10 @@ Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／�
 
 從 [Releases](https://github.com/firzenfu/codex-ambient/releases) 下載 `CodexAmbient.exe`。EXE 約 34 MB，已內附 Node.js；不需要另外安裝 Node.js、npm 套件或取得系統管理員權限。
 
+右上角的語言選單可切換 **繁體中文／English**，介面、預覽文案及提示會立即切換，不會重新啟動背景或影片。語言選擇會自動保存，下次開啟時恢復；EXE 系統匣選單在下次打開時也會使用相同語言。
+
+更新版本前，請先從系統匣選單離開舊版 Ambient，再開啟新版 EXE。
+
 1. 雙擊 EXE，開啟即時預覽。使用 Microsoft Edge 的獨立應用程式視窗，未安裝 Edge 時改用預設瀏覽器。
 2. 完成目前工作並完全結束 Codex（包含系統匣）。
 3. 在 Ambient 系統匣圖示按右鍵，選「啟動 Codex（背景模式）」。不會強制關閉正在執行的 Codex。
@@ -28,6 +32,7 @@ Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／�
 - 要關閉偵錯介面，完全結束 Codex，從原本捷徑重新開啟。
 - EXE 的執行環境解開至 `%LOCALAPPDATA%/CodexAmbient/engine-…`，設定存於 `%LOCALAPPDATA%/CodexAmbient/settings/`。
 - 原始碼啟動方式的設定存於專案的 `data/settings.json`。
+- 語言偏好另存於同一設定資料夾的 `ui.json`，切換語言不會改動背景偏好。
 - 素材只在記憶體中處理，不上傳；下次開啟控制台需重新選擇素材。
 - 不修改 `app.asar`、Codex 設定檔、對話或登入資料。
 
@@ -91,7 +96,7 @@ EXE 可用下列方式進行無介面的獨立啟動測試，結果寫入指定�
 | --- | --- |
 | `server.mjs` | 本機控制台、設定保存、套用 API |
 | `lib/` | 輸入驗證及限定本機的 CDP 連線 |
-| `public/` | 繁體中文介面、共用背景引擎、圖示 |
+| `public/` | 中英文介面、翻譯、共用背景引擎、圖示 |
 | `packaging/` | Windows EXE 啟動器與封裝腳本 |
 | `tests/` | 單元、HTTP 與瀏覽器整合檢查 |
 

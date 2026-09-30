@@ -4,13 +4,17 @@
 
 Animated backgrounds for the Codex desktop app on Windows. Preview aurora, ocean and starfield animations, or use local videos, GIFs and images. Adjust background strength, blur and speed, pause playback, and restore the original appearance with one click.
 
-This is an unofficial, experimental appearance tool. It is not affiliated with OpenAI. The current application interface is in Traditional Chinese; this page provides English instructions and translations of the relevant controls.
+This is an unofficial, experimental appearance tool. It is not affiliated with OpenAI. The interface supports English and Traditional Chinese.
 
-![Codex Ambient control panel preview](docs/preview.png)
+![Codex Ambient control panel preview](docs/preview.en.png)
 
 ## Download and use
 
 Download `CodexAmbient.exe` from [Releases](https://github.com/firzenfu/codex-ambient/releases). The executable is approximately 34 MB and includes Node.js. No separate Node.js installation, npm packages or administrator privileges are required.
+
+Choose **English** in the language selector at the top right of the control panel. The interface, preview text and messages change immediately, without restarting your background or video. Your choice is saved automatically and restored the next time you open the tool. The EXE tray menu uses the same preference when you next open the menu.
+
+When upgrading, quit the previous Ambient version from its tray menu before opening the new EXE.
 
 1. Double-click the EXE to open the live preview. It uses a standalone Microsoft Edge app window, falling back to your default browser if Edge is unavailable.
 2. Finish your current work and fully exit Codex, including its system tray process.
@@ -28,6 +32,7 @@ Closing the preview window leaves Ambient in the system tray. Right-click its ic
 - To close the debugging interface, fully exit Codex and reopen it using its original shortcut.
 - The EXE extracts its runtime to `%LOCALAPPDATA%/CodexAmbient/engine-…` and stores settings in `%LOCALAPPDATA%/CodexAmbient/settings/`.
 - When running from source, settings are stored in the project's `data/settings.json`.
+- The language preference is stored separately in `ui.json` in the same settings directory, so changing it preserves your background preferences.
 - Media is processed in memory and is not uploaded. Select it again when you next open the control panel.
 - The tool does not modify `app.asar`, Codex configuration files, conversations or sign-in data.
 
@@ -91,7 +96,7 @@ Run a standalone, headless EXE startup smoke test with the following command. Re
 | --- | --- |
 | `server.mjs` | Local control panel, settings storage and apply API |
 | `lib/` | Input validation and local-only CDP connection |
-| `public/` | Traditional Chinese interface, shared background renderer and icons |
+| `public/` | English/Traditional Chinese interface, translations, shared background renderer and icons |
 | `packaging/` | Windows EXE launcher and build script |
 | `tests/` | Unit, HTTP and browser integration checks |
 

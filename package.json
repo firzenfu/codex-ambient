@@ -1,6 +1,6 @@
 {
   "name": "codex-ambient",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "description": "Local, reversible animated backgrounds for the Windows Codex desktop app",

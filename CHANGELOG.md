@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2 — 2026-09-29
+
+- Added an English / Traditional Chinese selector with automatic preference persistence.
+- Translated controls, preview copy, accessibility labels, status and error messages, and EXE tray menus.
+- Changing language preserves the active background, selected media and video playback.
+- Added authenticated language settings, failure recovery and bilingual responsive browser checks.
+- Added upgrade guidance when an older Ambient service is still running.
+
 ## 0.2.1 — 2026-09-29
 
 首次公開實驗版。
