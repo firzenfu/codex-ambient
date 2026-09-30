@@ -1,5 +1,7 @@
 # Codex Ambient
 
+**繁體中文** | [English](README.en.md)
+
 Windows Codex 桌面 App 的動態背景工具。支援即時預覽、極光／海洋／星空動畫、本機影片、GIF 和圖片，以及背景強度、柔焦、速度、暫停與一鍵還原。
 
 這是非官方的實驗性外觀工具，與 OpenAI 無隸屬關係。
